@@ -78,6 +78,14 @@ def sendSMS(msg):
     time.sleep(3)
     print("Sucess! Your message was delivered :)")
 
+def PH(a,b):
+    ph=random.uniform(a,b)
+    print(round(ph,2))
+    msg5 = "The PH of water is "+ str(ph)
+    print(msg5)
+    publish.single("MajorProj/topic1",str(msg5), hostname="broker.hivemq.com")
+    time.sleep(3)
+
 
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code "+str(rc))  
@@ -85,15 +93,17 @@ def on_connect(client, userdata, flags, rc):
 
 def on_message(client, userdata, msg):
     print(msg.topic+" -> "+str(msg.payload))
+    n1 = float(str1[:3])
+    n2= float(str1[3:])
     Turbidity()
     TDS()
     temperature()
     ECValue()
+    PH(n1,n2)
 
 client = mqtt.Client()
 client.on_connect = on_connect
 client.on_message = on_message
 client.connect("broker.hivemq.com", 1883, 60)
 client.loop_forever()
-
 
