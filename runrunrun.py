@@ -19,7 +19,7 @@ ads = ADS.ADS1115(i2c)
 SERIAL_PORT = "/dev/ttyS0"
 
 #Configure the <gsm Module
-ser = serial.Serial(SERIAL_PORT ,baudrate =9600, timeout = 5)
+ser = serial.Serial(SERIAL_PORT ,baudrate = 9600, timeout = 5)
 
 #Initialising Temperature Sensor
 
@@ -29,7 +29,7 @@ def TDS():
     sensorValue = chan.value
     voltage = sensorValue*5/65536
     tdsValue = abs((134.42/voltage*voltage*voltage - 255.86*voltage*voltage + 857.39*voltage)*0.5)
-    msg2 = "TDS is : " + str(tdsValue) + " PPM"
+    msg2 = "TDS is : " + str(round(tdsValue,3)) + " PPM"
     print(msg2)
     sendSMS(msg2)
     publish.single("MajorProj/topic1",str(msg2),hostname="broker.hivemq.com")
@@ -41,7 +41,7 @@ def Turbidity():
     value = chan1.value*6  
     volt = (value/65536*4.5)/ 1.05  #voltage to calibrate the offset
     trb =  ((-7.0)*volt*volt*volt + (44.9)*volt*volt + (-94.5)*volt + (70.7))/2.5
-    msg1 = "Turbidity is : " +str(trb) + " NTU "
+    msg1 = "Turbidity is : " +str(round(trb,3)) + " NTU "
     print(msg1)    
     sendSMS(msg1)
     publish.single("MajorProj/topic1",str(msg1), hostname="broker.hivemq.com")
@@ -51,7 +51,7 @@ def temperature():
     sensor = W1ThermSensor()
     temp = sensor.get_temperature()
     time.sleep(2)
-    msg3 = "The temperature is "+str(temp)+" degree Celcius "
+    msg3 = "The temperature is "+str(round(temp,2))+" degree Celcius "
     print(msg3)
     publish.single("MajorProj/topic1",str(msg3), hostname="broker.hivemq.com")
     sendSMS(msg3)
@@ -60,7 +60,7 @@ def ECValue():
     sensor = W1ThermSensor()
     temp = sensor.get_temperature()
     EC = 0.5706+ (1.756*(0.0001)*temp) - (6.46*(0.00000001)*temp*temp)
-    msg4 = "The EC of Water is "+str(EC)+" Units"
+    msg4 = "The EC of Water is "+str(round(EC,3))+" Units"
     print(msg4)
     publish.single("MajorProj/topic1",str(msg4), hostname="broker.hivemq.com")
     sendSMS(msg4)
@@ -68,15 +68,15 @@ def ECValue():
 def sendSMS(msg):
     enableSMS = "AT+CMGF=1\r"
     ser.write(enableSMS.encode())
-    print("\nSMS Mode is now enabled")
+    #print("\nSMS Mode is now enabled")
     time.sleep(3)
     setNum = 'AT+CMGS="8310301480"\r'
     ser.write(setNum.encode())
-    print("Sending the Paramater recieved from Sensor")
+    print("Sending ....")
     time.sleep(3)
     ser.write(msg.encode()+chr(26).encode())
     time.sleep(3)
-    print("Sucess! Your message was delivered :)")
+    print("Sucess! ")
 
 def PH(a=5.5,b=7.5):
     ph=random.uniform(a,b)
